@@ -5,10 +5,12 @@ const PgSession = require('connect-pg-simple')(session);
 const path = require('path');
 const { pool, initDb } = require('./db');
 
-const app = express(); 
+const app = express();
 const PORT = process.env.PORT || 3000;
+
 // Trust Railway's reverse proxy so secure cookies work correctly over HTTPS
 app.set('trust proxy', 1);
+
 // View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -22,19 +24,15 @@ app.use(express.json());
 
 // Sessions stored in Postgres
 app.use(session({
-  store: new PgSession({ 
-    pool, 
-    tableName: 'session',
-    createTableIfMissing: true,  // added to deal with error when table does not exist.
-  }),
+  store: new PgSession({ pool, tableName: 'session' }),
   secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    httpOnly: true, 
+    httpOnly: true,
     sameSite: 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   },
 }));
 

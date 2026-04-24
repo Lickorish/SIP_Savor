@@ -46,3 +46,13 @@ CREATE INDEX IF NOT EXISTS idx_establishments_name ON establishments USING gin(t
 CREATE INDEX IF NOT EXISTS idx_establishments_city ON establishments(city);
 CREATE INDEX IF NOT EXISTS idx_reviews_establishment ON reviews(establishment_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_user ON reviews(user_id);
+
+-- Add website column if it doesn't exist (safe to run on existing databases)
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name='establishments' AND column_name='website'
+  ) THEN
+    ALTER TABLE establishments ADD COLUMN website VARCHAR(500);
+  END IF;
+END $$;

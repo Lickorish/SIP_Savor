@@ -104,7 +104,7 @@ router.get('/add', requireAuth, (req, res) => {
 });
 
 router.post('/add', requireAuth, upload.array('photos', 5), async (req, res) => {
-  const { name, type, address, city, country, lat, lng, rating, comment, visited_date } = req.body;
+  const { name, type, address, city, country, lat, lng, website, rating, comment, visited_date } = req.body;
 
   if (!name || !type || !rating) {
     return res.render('add-establishment', {
@@ -119,10 +119,10 @@ router.post('/add', requireAuth, upload.array('photos', 5), async (req, res) => 
     await client.query('BEGIN');
 
     const estResult = await client.query(
-      `INSERT INTO establishments (name, type, address, city, country, lat, lng, added_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      `INSERT INTO establishments (name, type, address, city, country, lat, lng, website, added_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
       [name.trim(), type, address || null, city || null, country || 'UK',
-       lat ? parseFloat(lat) : null, lng ? parseFloat(lng) : null, req.session.userId]
+       lat ? parseFloat(lat) : null, lng ? parseFloat(lng) : null, website || null, req.session.userId]
     );
     const establishmentId = estResult.rows[0].id;
 

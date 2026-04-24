@@ -8,6 +8,12 @@
     <% if (establishment.city || establishment.address) { %>
       <p class="address"><%= [establishment.address, establishment.city, establishment.country].filter(Boolean).join(', ') %></p>
     <% } %>
+    <% if (establishment.website) { %>
+      <a href="<%= establishment.website %>" target="_blank" rel="noopener"
+        style="display:inline-flex; align-items:center; gap:0.4rem; margin-top:0.5rem; color:var(--caramel); font-size:0.9rem; text-decoration:none;">
+        🌐 <%= establishment.website.replace(/^https?:\/\//, '') %>
+      </a>
+    <% } %>
     <div class="rating-summary">
       <% if (establishment.avg_rating) { %>
         <span class="big-rating"><%= establishment.avg_rating %></span>
