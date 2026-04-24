@@ -257,4 +257,30 @@ router.post('/review/:id/delete', requireAuth, async (req, res) => {
   res.redirect(`/place/${estId}`);
 });
 
+// ── Delete establishment (admin only) ────────────────────────────────────────
+router.post('/place/:id/delete', requireAuth, async (req, res) => {
+  if (!req.session.isAdmin) return res.redirect('/');
+
+  const { id } = req.params;
+
+  // Get all photos across all reviews for this establishment
+  const photos = await pool.query(`
+    SELECT rp.cloudinary_public_id
+    FROM review_photos rp
+    JOIN reviews r ON r.id = rp.review_id
+    WHERE r.establishment_id = $1
+  `, [id]);
+
+  // Delete from Cloudinary
+  for (const p of photos.rows) {
+    try { await cloudinary.uploader.destroy(p.cloudinary_public_id); } catch (e) { /* ignore */ }
+  }
+
+  // Delete establishment (cascades to reviews and review_photos via DB)
+  await pool.query('DELETE FROM establishments WHERE id = $1', [id]);
+
+  res.redirect('/');
+});
+
+
 module.exports = router;
