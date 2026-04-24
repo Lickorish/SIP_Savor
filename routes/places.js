@@ -143,7 +143,7 @@ router.post('/add', requireAuth, upload.array('photos', 5), async (req, res) => 
     }
 
     await client.query('COMMIT');
-    res.redirect(`/place/${establishmentId}`);
+    res.redirect('/');
   } catch (err) {
     await client.query('ROLLBACK');
     console.error(err);
@@ -234,7 +234,7 @@ router.post('/place/:id/review', requireAuth, upload.array('photos', 5), async (
     client.release();
   }
 
-  res.redirect(`/place/${id}`);
+  res.redirect('/');
 });
 
 // ── Delete review (own or admin) ──────────────────────────────────────────────
