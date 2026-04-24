@@ -1,0 +1,184 @@
+<%- include('partials/header', {title: 'Search'}) %>
+
+<div class="page-header">
+  <div class="eyebrow">Find a place</div>
+  <h1>Search &amp; Discover</h1>
+  <p>Search by name or location, or find what's nearby</p>
+</div>
+
+<div class="container">
+
+  <!-- Text search -->
+  <form method="GET" action="/search">
+    <div class="search-bar">
+      <input
+        type="text"
+        name="q"
+        value="<%= q %>"
+        placeholder="Search by name, city or address…"
+        autofocus
+      >
+      <select name="type">
+        <option value="all" <%= type === 'all' ? 'selected' : '' %>>All types</option>
+        <option value="coffee"     <%= type === 'coffee'     ? 'selected' : '' %>>Coffee</option>
+        <option value="restaurant" <%= type === 'restaurant' ? 'selected' : '' %>>Restaurant</option>
+        <option value="pub"        <%= type === 'pub'        ? 'selected' : '' %>>Pub</option>
+        <option value="bakery"     <%= type === 'bakery'     ? 'selected' : '' %>>Bakery</option>
+        <option value="bar"        <%= type === 'bar'        ? 'selected' : '' %>>Bar</option>
+        <option value="cafe"       <%= type === 'cafe'       ? 'selected' : '' %>>Café</option>
+        <option value="other"      <%= type === 'other'      ? 'selected' : '' %>>Other</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+  </form>
+
+  <!-- Text search results -->
+  <% if (q) { %>
+    <% if (results.length === 0) { %>
+      <div class="empty-state" style="padding:2rem;">
+        <div class="icon">🔍</div>
+        <h3>No results for "<%= q %>"</h3>
+        <p>Try a different search term, or <a href="/add">add this place</a></p>
+      </div>
+    <% } else { %>
+      <p style="color:var(--muted); font-style:italic; font-size:0.9rem; margin-bottom:1rem;">
+        <%= results.length %> result<%= results.length !== 1 ? 's' : '' %> for "<%= q %>"
+      </p>
+      <div class="establishments-grid">
+        <% results.forEach(est => { %>
+          <a href="/place/<%= est.id %>" class="card card-link est-card">
+            <span class="est-type type-<%= est.type %>"><%= est.type %></span>
+            <h3><%= est.name %></h3>
+            <% if (est.city || est.address) { %>
+              <p class="location"><%= [est.address, est.city].filter(Boolean).join(', ') %></p>
+            <% } %>
+            <div class="meta">
+              <% if (est.avg_rating) { %>
+                <div class="star-display">
+                  <div class="stars">
+                    <% const s = Math.round(parseFloat(est.avg_rating)); for (let i=1;i<=5;i++) { %>
+                      <span class="star <%= i<=s?'filled':'' %>">★</span>
+                    <% } %>
+                  </div>
+                  <span class="avg"><%= est.avg_rating %></span>
+                </div>
+              <% } %>
+              <span class="review-count"><%= est.review_count %> review<%= est.review_count!==1?'s':'' %></span>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  <% } %>
+
+  <!-- Nearby section -->
+  <div class="divider-label" id="nearby" style="margin-top: 3rem;">
+    <span>📍 Near Me</span>
+  </div>
+
+  <div class="nearby-controls">
+    <button id="btn-nearby" class="btn btn-secondary">Find places near me</button>
+    <select id="nearby-type" class="form-select" style="width:auto; min-width:140px; padding:0.65rem 2.5rem 0.65rem 0.9rem; border:1.5px solid var(--border); border-radius:var(--radius); font-family:Lora,serif; font-size:0.95rem; color:var(--espresso); background:white;">
+      <option value="">All types</option>
+      <option value="coffee">Coffee</option>
+      <option value="restaurant">Restaurant</option>
+      <option value="pub">Pub</option>
+      <option value="bakery">Bakery</option>
+      <option value="bar">Bar</option>
+      <option value="cafe">Café</option>
+      <option value="other">Other</option>
+    </select>
+    <select id="nearby-radius" style="width:auto; padding:0.65rem 2.5rem 0.65rem 0.9rem; border:1.5px solid var(--border); border-radius:var(--radius); font-family:Lora,serif; font-size:0.95rem; color:var(--espresso); background:white; appearance:none;">
+      <option value="5">Within 5 km</option>
+      <option value="10" selected>Within 10 km</option>
+      <option value="25">Within 25 km</option>
+      <option value="50">Within 50 km</option>
+    </select>
+  </div>
+
+  <div id="nearby-status" style="display:none;" class="alert alert-info">
+    Getting your location…
+  </div>
+
+  <div id="nearby-results"></div>
+</div>
+
+<script>
+document.getElementById('btn-nearby').addEventListener('click', () => {
+  const status = document.getElementById('nearby-status');
+  const results = document.getElementById('nearby-results');
+  status.style.display = 'block';
+  status.textContent = 'Getting your location…';
+  results.innerHTML = '';
+
+  if (!navigator.geolocation) {
+    status.className = 'alert alert-error';
+    status.textContent = 'Geolocation is not supported by your browser';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const { latitude, longitude } = pos.coords;
+    const radius = document.getElementById('nearby-radius').value;
+    const type   = document.getElementById('nearby-type').value;
+
+    status.textContent = 'Searching nearby…';
+
+    try {
+      const res = await fetch(`/api/nearby?lat=${latitude}&lng=${longitude}&radius=${radius}`);
+      const places = await res.json();
+
+      const filtered = type ? places.filter(p => p.type === type) : places;
+
+      status.style.display = 'none';
+
+      if (filtered.length === 0) {
+        results.innerHTML = `
+          <div class="empty-state" style="padding:2rem">
+            <div class="icon">🗺️</div>
+            <h3>Nothing nearby</h3>
+            <p>No places found within ${radius} km — try a larger radius, or <a href="/add">add one</a></p>
+          </div>`;
+        return;
+      }
+
+      results.innerHTML = `
+        <p style="color:var(--muted); font-style:italic; font-size:0.9rem; margin-bottom:1rem">
+          ${filtered.length} place${filtered.length!==1?'s':''} within ${radius} km
+        </p>
+        <div class="establishments-grid">
+          ${filtered.map(est => `
+            <a href="/place/${est.id}" class="card card-link est-card">
+              <span class="est-type type-${est.type}">${est.type}</span>
+              <h3>${est.name}</h3>
+              ${est.city || est.address ? `<p class="location">${[est.address, est.city].filter(Boolean).join(', ')}</p>` : ''}
+              <div class="meta">
+                ${est.avg_rating ? `
+                  <div class="star-display">
+                    <div class="stars">
+                      ${'★'.repeat(Math.round(est.avg_rating)).split('').map((_,i) => `<span class="star filled">★</span>`).join('')}
+                      ${'★'.repeat(5 - Math.round(est.avg_rating)).split('').map(() => `<span class="star">★</span>`).join('')}
+                    </div>
+                    <span class="avg">${est.avg_rating}</span>
+                  </div>
+                ` : '<span style="color:var(--muted); font-style:italic; font-size:0.85rem">No reviews yet</span>'}
+                <span class="review-count">${est.review_count} review${est.review_count!=1?'s':''}</span>
+                <span style="margin-left:auto; font-family:\'DM Mono\', monospace; font-size:0.75rem; color:var(--caramel)">
+                  ${est.distance_km} km
+                </span>
+              </div>
+            </a>
+          `).join('')}
+        </div>`;
+    } catch (err) {
+      status.className = 'alert alert-error';
+      status.textContent = 'Failed to load nearby places';
+    }
+  }, err => {
+    status.className = 'alert alert-error';
+    status.textContent = 'Could not get your location. Please allow location access.';
+  });
+});
+</script>
+
+<%- include('partials/footer') %>

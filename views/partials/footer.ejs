@@ -1,0 +1,41 @@
+<footer style="text-align:center; padding: 2rem; color: var(--muted); font-size:0.8rem; font-style:italic; border-top: 1px solid var(--border); margin-top: 4rem;">
+  Sip &amp; Savour &mdash; a private place for friends who know good coffee
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" onclick="document.getElementById('lightbox').classList.remove('open')">&times;</span>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+  // Lightbox
+  document.querySelectorAll('.review-photos img').forEach(img => {
+    img.addEventListener('click', () => {
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lightbox').classList.add('open');
+    });
+  });
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+
+  // Photo upload preview
+  const fileInput = document.getElementById('photos');
+  const preview = document.getElementById('photo-preview');
+  if (fileInput && preview) {
+    fileInput.addEventListener('change', () => {
+      preview.innerHTML = '';
+      Array.from(fileInput.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<%- include('partials/header', {title: 'Add a Place'}) %>
+
+<div class="page-header">
+  <div class="eyebrow">Share a discovery</div>
+  <h1>Add a New Place</h1>
+  <p>Tell us about somewhere worth visiting</p>
+</div>
+
+<div class="container-narrow">
+
+  <% if (error) { %>
+    <div class="alert alert-error"><%= error %></div>
+  <% } %>
+
+  <form method="POST" action="/add" enctype="multipart/form-data" class="card" style="padding:2rem">
+
+    <div class="divider-label" style="margin-top:0">
+      <span>About the place</span>
+    </div>
+
+    <div class="form-group">
+      <label for="name">Name <span style="color:#c0392b">*</span></label>
+      <input type="text" id="name" name="name" placeholder="e.g. The Rusty Kettle" required>
+    </div>
+
+    <div class="form-group">
+      <label for="type">Type <span style="color:#c0392b">*</span></label>
+      <select id="type" name="type" required>
+        <option value="">— select a type —</option>
+        <option value="coffee">Coffee shop</option>
+        <option value="restaurant">Restaurant</option>
+        <option value="pub">Pub</option>
+        <option value="bakery">Bakery</option>
+        <option value="bar">Bar</option>
+        <option value="cafe">Café</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem">
+      <div class="form-group">
+        <label for="city">City / Town</label>
+        <input type="text" id="city" name="city" placeholder="e.g. Edinburgh">
+      </div>
+      <div class="form-group">
+        <label for="country">Country</label>
+        <input type="text" id="country" name="country" value="UK" placeholder="UK">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="address">Street address <span class="hint">(optional)</span></label>
+      <input type="text" id="address" name="address" placeholder="e.g. 14 High Street">
+    </div>
+
+    <!-- Geo pin -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem">
+      <div class="form-group">
+        <label for="lat">Latitude <span class="hint">(for Near Me)</span></label>
+        <input type="text" id="lat" name="lat" placeholder="e.g. 51.5074">
+      </div>
+      <div class="form-group">
+        <label for="lng">Longitude</label>
+        <input type="text" id="lng" name="lng" placeholder="e.g. -0.1278">
+      </div>
+    </div>
+    <button type="button" id="btn-get-location" class="btn btn-ghost btn-sm" style="margin-top:-0.5rem; margin-bottom:1.25rem;">
+      📍 Use my current location
+    </button>
+
+    <div class="divider-label">
+      <span>Your review</span>
+    </div>
+
+    <div class="form-group">
+      <label>Rating <span style="color:#c0392b">*</span></label>
+      <div class="star-input">
+        <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
+        <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
+        <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
+        <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
+        <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="comment">Comments <span class="hint">(optional)</span></label>
+      <textarea id="comment" name="comment" placeholder="What made it special? What should people order?"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="visited_date">Date visited <span class="hint">(optional)</span></label>
+      <input type="date" id="visited_date" name="visited_date">
+    </div>
+
+    <div class="form-group">
+      <label>Photos <span class="hint">(optional, up to 5)</span></label>
+      <div class="photo-upload-area" onclick="document.getElementById('photos').click()">
+        <input type="file" id="photos" name="photos" accept="image/*" multiple>
+        <p style="color:var(--muted); font-size:0.9rem; font-style:italic">
+          Click to choose photos, or drag &amp; drop
+        </p>
+        <p style="color:var(--muted); font-size:0.75rem; margin-top:0.25rem">JPG, PNG, WebP · up to 10MB each</p>
+      </div>
+      <div class="photo-preview" id="photo-preview"></div>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; margin-top:0.5rem">
+      <button type="submit" class="btn btn-primary btn-lg" style="flex:1">Add Place &amp; Review</button>
+      <a href="/" class="btn btn-ghost btn-lg">Cancel</a>
+    </div>
+
+  </form>
+</div>
+
+<script>
+document.getElementById('btn-get-location').addEventListener('click', function() {
+  this.textContent = 'Getting location…';
+  this.disabled = true;
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.getElementById('lat').value = pos.coords.latitude.toFixed(6);
+    document.getElementById('lng').value = pos.coords.longitude.toFixed(6);
+    this.textContent = '✓ Location set';
+  }, () => {
+    this.textContent = '📍 Use my current location';
+    this.disabled = false;
+    alert('Could not get location. You can enter lat/lng manually.');
+  });
+});
+</script>
+
+<%- include('partials/footer') %>

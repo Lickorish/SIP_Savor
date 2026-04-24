@@ -1,0 +1,10 @@
+<%- include('partials/header', {title: 'Error'}) %>
+
+<div class="container-narrow" style="text-align:center; padding-top:4rem">
+  <div style="font-size:3rem; margin-bottom:1rem">☕</div>
+  <h1 style="margin-bottom:0.75rem">Something went wrong</h1>
+  <p style="color:var(--muted); font-style:italic; margin-bottom:2rem"><%= message || 'An unexpected error occurred' %></p>
+  <a href="/" class="btn btn-primary">Back to home</a>
+</div>
+
+<%- include('partials/footer') %>

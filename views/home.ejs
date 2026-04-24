@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<div class="page-header">
+  <div class="eyebrow">Your curated collection</div>
+  <h1>Sip &amp; Savour</h1>
+  <p>Places worth writing home about</p>
+</div>
+
+<div class="container">
+  <% if (establishments.length === 0) { %>
+    <div class="empty-state">
+      <div class="icon">☕</div>
+      <h3>No places yet</h3>
+      <p>Be the first to add a coffee shop, restaurant, pub or bakery</p>
+      <a href="/add" class="btn btn-primary" style="margin-top:1.25rem">+ Add the first place</a>
+    </div>
+  <% } else { %>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.75rem;">
+      <p style="color:var(--muted); font-style:italic; font-size:0.9rem;">
+        <%= establishments.length %> place<%= establishments.length !== 1 ? 's' : '' %> reviewed
+      </p>
+      <div style="display:flex; gap:0.5rem;">
+        <a href="/search" class="btn btn-secondary btn-sm">Search</a>
+        <a href="/add" class="btn btn-primary btn-sm">+ Add Place</a>
+      </div>
+    </div>
+
+    <div class="establishments-grid">
+      <% establishments.forEach(est => { %>
+        <a href="/place/<%= est.id %>" class="card card-link est-card">
+          <span class="est-type type-<%= est.type %>"><%= est.type %></span>
+          <h3><%= est.name %></h3>
+          <% if (est.city || est.address) { %>
+            <p class="location">
+              <%= [est.address, est.city].filter(Boolean).join(', ') %>
+            </p>
+          <% } %>
+          <div class="meta">
+            <% if (est.avg_rating) { %>
+              <div class="star-display">
+                <% const stars = Math.round(parseFloat(est.avg_rating)); %>
+                <div class="stars">
+                  <% for (let i = 1; i <= 5; i++) { %>
+                    <span class="star <%= i <= stars ? 'filled' : '' %>">★</span>
+                  <% } %>
+                </div>
+                <span class="avg"><%= est.avg_rating %></span>
+              </div>
+            <% } else { %>
+              <span style="color:var(--muted); font-style:italic; font-size:0.85rem;">No reviews yet</span>
+            <% } %>
+            <span class="review-count">
+              <%= est.review_count %> review<%= est.review_count !== 1 ? 's' : '' %>
+            </span>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
