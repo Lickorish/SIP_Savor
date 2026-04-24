@@ -40,6 +40,7 @@ app.use(session({
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/places'));
 app.use('/admin', require('./routes/admin'));
+app.use('/account', require('./routes/account'));
 
 // 404
 app.use((req, res) => {
