@@ -15,12 +15,13 @@
     <div class="alert alert-success"><%= success %></div>
   <% } %>
 
-  <div style="display:grid; grid-template-columns:1fr 340px; gap:2rem; align-items:start">
+  <div class="admin-layout">
 
     <!-- User list -->
+    <div class="admin-users-col">
     <div class="card">
       <h3 style="margin-bottom:1.25rem">Members (<%= users.length %>)</h3>
-      <table class="data-table">
+      <div class="table-wrap"><table class="data-table">
         <thead>
           <tr>
             <th>Username</th>
@@ -68,11 +69,13 @@
             </tr>
           <% }) %>
         </tbody>
-      </table>
+      </table></div>
     </div>
 
+    </div><!-- /admin-users-col -->
     <!-- Invite / create user -->
-    <div class="card" style="position:sticky; top:80px">
+    <div class="admin-form-col">
+    <div class="card">
       <h3 style="margin-bottom:1.25rem">Invite a Member</h3>
       <form method="POST" action="/admin/users/create">
 
@@ -105,6 +108,7 @@
         Ask them to note it down — passwords are stored as hashes and cannot be recovered.
       </p>
     </div>
+    </div><!-- /admin-form-col -->
 
   </div>
 </div>

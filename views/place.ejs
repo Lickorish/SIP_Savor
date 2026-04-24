@@ -36,10 +36,10 @@
   </div>
 </div>
 
-<div class="container" style="display:grid; grid-template-columns:1fr 340px; gap:2.5rem; align-items:start; margin-top:2rem">
+<div class="place-layout">
 
-  <!-- Left: reviews -->
-  <div>
+  <!-- Reviews -->
+  <div class="reviews-col">
     <h2 style="margin-bottom:1.25rem">
       Reviews
       <span style="font-size:1rem; font-weight:400; color:var(--muted); font-family:Lora,serif">
@@ -115,8 +115,8 @@
     <% } %>
   </div>
 
-  <!-- Right: add review form -->
-  <div>
+  <!-- Add review form -->
+  <div class="form-col">
     <div class="card" style="position:sticky; top:80px">
       <h3 style="margin-bottom:1.25rem">Add Your Review</h3>
 
@@ -159,11 +159,5 @@
 
 </div>
 
-<style>
-@media (max-width: 768px) {
-  .container > div:last-child { order: -1; }
-  .container { grid-template-columns: 1fr !important; }
-}
-</style>
 
 <%- include('partials/footer') %>

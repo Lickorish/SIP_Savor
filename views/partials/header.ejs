@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4a2c1a">
   <title><%= typeof title !== 'undefined' ? title + ' · Sip & Savour' : 'Sip & Savour' %></title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>">
@@ -12,7 +13,12 @@
 <nav class="nav">
   <div class="nav-inner">
     <a href="/" class="nav-brand">Sip <span>&</span> Savour</a>
-    <ul class="nav-links">
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-menu" id="nav-menu">
       <li><a href="/">Home</a></li>
       <li><a href="/search">Search</a></li>
       <li><a href="/search#nearby">Near Me</a></li>
@@ -21,13 +27,27 @@
         <li><a href="/admin">Admin</a></li>
       <% } %>
       <li>
-        <form method="POST" action="/logout" style="display:inline">
+        <form method="POST" action="/logout">
           <button type="submit" class="btn btn-ghost btn-sm">Sign out</button>
         </form>
       </li>
     </ul>
+
     <% if (typeof user !== 'undefined' && user) { %>
       <span class="nav-user">👤 <%= user %></span>
     <% } %>
   </div>
 </nav>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const menu   = document.getElementById('nav-menu');
+  toggle.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  // Close menu when a link is tapped
+  menu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => menu.classList.remove('open'));
+  });
+</script>
