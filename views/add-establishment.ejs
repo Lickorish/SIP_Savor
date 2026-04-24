@@ -12,66 +12,104 @@
     <div class="alert alert-error"><%= error %></div>
   <% } %>
 
-  <form method="POST" action="/add" enctype="multipart/form-data" class="card" style="padding:2rem">
+  <form method="POST" action="/add" enctype="multipart/form-data" class="card" style="padding:1.5rem">
 
     <div class="divider-label" style="margin-top:0">
       <span>About the place</span>
     </div>
 
-    <div class="form-group">
-      <label for="name">Name <span style="color:#c0392b">*</span></label>
-      <input type="text" id="name" name="name" placeholder="e.g. The Rusty Kettle" required>
-    </div>
-
-    <div class="form-group">
-      <label for="type">Type <span style="color:#c0392b">*</span></label>
-      <select id="type" name="type" required>
-        <option value="">— select a type —</option>
-        <option value="coffee">Coffee shop</option>
-        <option value="restaurant">Restaurant</option>
-        <option value="pub">Pub</option>
-        <option value="bakery">Bakery</option>
-        <option value="bar">Bar</option>
-        <option value="cafe">Café</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="city">City / Town</label>
-        <input type="text" id="city" name="city" placeholder="e.g. Edinburgh">
+    <!-- Google Places search box -->
+    <div class="form-group" id="search-group">
+      <label for="place-search">Search for a place</label>
+      <div style="position:relative">
+        <input
+          type="text"
+          id="place-search"
+          placeholder="Start typing a name or address…"
+          autocomplete="off"
+          style="padding-left:2.25rem"
+        >
+        <span style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); font-size:1rem; pointer-events:none">🔍</span>
       </div>
-      <div class="form-group">
-        <label for="country">Country</label>
-        <input type="text" id="country" name="country" value="UK" placeholder="UK">
-      </div>
+      <p id="search-hint" style="font-size:0.78rem; color:var(--caramel); font-style:italic; margin-top:0.35rem">
+        Select a result to auto-fill the details below
+      </p>
     </div>
 
-    <div class="form-group">
-      <label for="address">Street address <span class="hint">(optional)</span></label>
-      <input type="text" id="address" name="address" placeholder="e.g. 14 High Street">
-    </div>
+    <!-- Auto-filled or manual fields -->
+    <div id="manual-fields">
 
-    <div class="form-group">
-      <label for="website">Website <span class="hint">(optional)</span></label>
-      <input type="text" id="website" name="website" placeholder="e.g. https://www.therustykettle.co.uk">
-    </div>
+      <div class="form-group">
+        <label for="name">Name <span style="color:#c0392b">*</span></label>
+        <input type="text" id="name" name="name" placeholder="e.g. The Rusty Kettle" required>
+      </div>
 
-    <!-- Geo pin -->
-    <div class="form-row">
       <div class="form-group">
-        <label for="lat">Latitude <span class="hint">(for Near Me)</span></label>
-        <input type="text" id="lat" name="lat" placeholder="e.g. 51.5074">
+        <label for="type">Type <span style="color:#c0392b">*</span></label>
+        <select id="type" name="type" required>
+          <option value="">— select a type —</option>
+          <option value="coffee">Coffee shop</option>
+          <option value="restaurant">Restaurant</option>
+          <option value="pub">Pub</option>
+          <option value="bakery">Bakery</option>
+          <option value="bar">Bar</option>
+          <option value="cafe">Café</option>
+          <option value="other">Other</option>
+        </select>
       </div>
+
       <div class="form-group">
-        <label for="lng">Longitude</label>
-        <input type="text" id="lng" name="lng" placeholder="e.g. -0.1278">
+        <label for="address">Street address</label>
+        <input type="text" id="address" name="address" placeholder="e.g. 14 High Street">
       </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">City / Town</label>
+          <input type="text" id="city" name="city" placeholder="e.g. Edinburgh">
+        </div>
+        <div class="form-group">
+          <label for="country">Country</label>
+          <input type="text" id="country" name="country" value="UK" placeholder="UK">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="website">Website <span class="hint">(optional)</span></label>
+        <input type="text" id="website" name="website" placeholder="e.g. https://www.therustykettle.co.uk">
+      </div>
+
+      <!-- Lat/lng — hidden by default, shown if no Google result -->
+      <div id="latlng-row" class="form-row" style="display:none">
+        <div class="form-group">
+          <label for="lat">Latitude</label>
+          <input type="text" id="lat" name="lat" placeholder="e.g. 51.5074">
+        </div>
+        <div class="form-group">
+          <label for="lng">Longitude</label>
+          <input type="text" id="lng" name="lng" placeholder="e.g. -0.1278">
+        </div>
+      </div>
+
+      <!-- Hidden fields populated by Places API -->
+      <input type="hidden" id="lat-hidden" name="lat">
+      <input type="hidden" id="lng-hidden" name="lng">
+
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; flex-wrap:wrap">
+        <button type="button" id="btn-get-location" class="btn btn-ghost btn-sm">
+          📍 Use my current location
+        </button>
+        <button type="button" id="btn-manual-latlng" class="btn btn-ghost btn-sm">
+          ✏️ Enter lat/lng manually
+        </button>
+      </div>
+
+      <!-- Auto-fill status badge -->
+      <div id="autofill-badge" style="display:none" class="alert alert-success" style="font-size:0.85rem">
+        ✓ Details filled from Google — check and adjust if needed
+      </div>
+
     </div>
-    <button type="button" id="btn-get-location" class="btn btn-ghost btn-sm" style="margin-top:-0.5rem; margin-bottom:1.25rem;">
-      📍 Use my current location
-    </button>
 
     <div class="divider-label">
       <span>Your review</span>
@@ -103,7 +141,7 @@
       <div class="photo-upload-area" onclick="document.getElementById('photos').click()">
         <input type="file" id="photos" name="photos" accept="image/*" multiple>
         <p style="color:var(--muted); font-size:0.9rem; font-style:italic">
-          Click to choose photos, or drag &amp; drop
+          Tap to choose photos
         </p>
         <p style="color:var(--muted); font-size:0.75rem; margin-top:0.25rem">JPG, PNG, WebP · up to 10MB each</p>
       </div>
@@ -118,20 +156,140 @@
   </form>
 </div>
 
+<!-- Google Places API -->
 <script>
-document.getElementById('btn-get-location').addEventListener('click', function() {
-  this.textContent = 'Getting location…';
-  this.disabled = true;
-  navigator.geolocation.getCurrentPosition(pos => {
-    document.getElementById('lat').value = pos.coords.latitude.toFixed(6);
-    document.getElementById('lng').value = pos.coords.longitude.toFixed(6);
-    this.textContent = '✓ Location set';
-  }, () => {
-    this.textContent = '📍 Use my current location';
-    this.disabled = false;
-    alert('Could not get location. You can enter lat/lng manually.');
+(function() {
+
+  // ── Type mapping from Google place types → our types ──
+  const typeMap = {
+    cafe:              'coffee',
+    coffee_shop:       'coffee',
+    bakery:            'bakery',
+    bar:               'bar',
+    pub:               'pub',
+    night_club:        'bar',
+    restaurant:        'restaurant',
+    meal_takeaway:     'restaurant',
+    meal_delivery:     'restaurant',
+    food:              'restaurant',
+  };
+
+  function guessType(types) {
+    if (!types) return '';
+    for (const t of types) {
+      if (typeMap[t]) return typeMap[t];
+    }
+    return 'other';
+  }
+
+  // ── Extract address components ──
+  function getComponent(components, type) {
+    const c = components.find(c => c.types.includes(type));
+    return c ? c.long_name : '';
+  }
+
+  // ── Initialise autocomplete ──
+  window.initPlacesAutocomplete = function() {
+    const input    = document.getElementById('place-search');
+    const nameEl   = document.getElementById('name');
+    const typeEl   = document.getElementById('type');
+    const addrEl   = document.getElementById('address');
+    const cityEl   = document.getElementById('city');
+    const countryEl= document.getElementById('country');
+    const websiteEl= document.getElementById('website');
+    const latH     = document.getElementById('lat-hidden');
+    const lngH     = document.getElementById('lng-hidden');
+    const badge    = document.getElementById('autofill-badge');
+
+    const autocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['establishment'],
+      fields: ['name', 'types', 'formatted_address', 'address_components',
+               'geometry', 'website', 'url'],
+    });
+
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) return;
+
+      const components = place.address_components || [];
+
+      // Populate fields
+      nameEl.value    = place.name || '';
+      addrEl.value    = [
+        getComponent(components, 'street_number'),
+        getComponent(components, 'route')
+      ].filter(Boolean).join(' ');
+      cityEl.value    = getComponent(components, 'postal_town')
+                     || getComponent(components, 'locality')
+                     || getComponent(components, 'administrative_area_level_2');
+      countryEl.value = getComponent(components, 'country') || 'UK';
+      websiteEl.value = place.website || '';
+      latH.value      = place.geometry.location.lat();
+      lngH.value      = place.geometry.location.lng();
+
+      // Auto-select type
+      const guessed = guessType(place.types);
+      if (guessed) typeEl.value = guessed;
+
+      // Clear the search box text so form doesn't look confusing
+      input.value = '';
+
+      // Show confirmation
+      badge.style.display = 'block';
+
+      // Scroll to name field so user can review
+      nameEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nameEl.focus();
+    });
+  };
+
+  // ── Manual lat/lng toggle ──
+  document.getElementById('btn-manual-latlng').addEventListener('click', function() {
+    const row = document.getElementById('latlng-row');
+    const hidden_lat = document.getElementById('lat-hidden');
+    const hidden_lng = document.getElementById('lng-hidden');
+    const visible = row.style.display !== 'none';
+    row.style.display = visible ? 'none' : 'grid';
+    if (!visible) {
+      // Sync hidden → visible when shown
+      document.getElementById('lat').value = hidden_lat.value;
+      document.getElementById('lng').value = hidden_lng.value;
+      // Keep visible in sync
+      ['lat','lng'].forEach(id => {
+        document.getElementById(id).addEventListener('input', function() {
+          document.getElementById(id + '-hidden').value = this.value;
+        });
+      });
+    }
+    this.textContent = visible ? '✏️ Enter lat/lng manually' : '✏️ Hide lat/lng';
   });
-});
+
+  // ── Use current location ──
+  document.getElementById('btn-get-location').addEventListener('click', function() {
+    this.textContent = 'Getting location…';
+    this.disabled = true;
+    navigator.geolocation.getCurrentPosition(pos => {
+      document.getElementById('lat-hidden').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('lng-hidden').value = pos.coords.longitude.toFixed(6);
+      // Also update visible fields if shown
+      if (document.getElementById('latlng-row').style.display !== 'none') {
+        document.getElementById('lat').value = pos.coords.latitude.toFixed(6);
+        document.getElementById('lng').value = pos.coords.longitude.toFixed(6);
+      }
+      this.textContent = '✓ Location captured';
+    }, () => {
+      this.textContent = '📍 Use my current location';
+      this.disabled = false;
+    });
+  });
+
+})();
+</script>
+
+<!-- Load Google Places — callback triggers autocomplete init -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOdZ4w-ZdfZPULslZDDXMvC04_d_XIjaI&libraries=places&callback=initPlacesAutocomplete"
+  async defer>
 </script>
 
 <%- include('partials/footer') %>
