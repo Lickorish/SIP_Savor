@@ -27,6 +27,7 @@
             <th>Username</th>
             <th>Role</th>
             <th>Member since</th>
+            <th>Last login</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -41,6 +42,14 @@
               </td>
               <td style="font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--muted)">
                 <%= new Date(u.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) %>
+              </td>
+              <td style="font-family:'DM Mono',monospace; font-size:0.8rem; color:var(--muted)">
+                <% if (u.last_login) { %>
+                  <%= new Date(u.last_login).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) %>
+                  <span style="opacity:0.6"><%= new Date(u.last_login).toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) %></span>
+                <% } else { %>
+                  <span style="opacity:0.4; font-style:italic">Never</span>
+                <% } %>
               </td>
               <td>
                 <div style="display:flex; gap:0.5rem; flex-wrap:wrap">

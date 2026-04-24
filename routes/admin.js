@@ -6,7 +6,7 @@ const { requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', requireAdmin, async (req, res) => {
-  const users = await pool.query('SELECT id, username, is_admin, created_at FROM users ORDER BY created_at');
+  const users = await pool.query('SELECT id, username, is_admin, created_at, last_login FROM users ORDER BY created_at');
   res.render('admin', {
     user: req.session.username,
     isAdmin: req.session.isAdmin,
@@ -19,7 +19,7 @@ router.get('/', requireAdmin, async (req, res) => {
 router.post('/users/create', requireAdmin, async (req, res) => {
   const { username, password, is_admin } = req.body;
   const renderAdmin = async (error, success) => {
-    const users = await pool.query('SELECT id, username, is_admin, created_at FROM users ORDER BY created_at');
+    const users = await pool.query('SELECT id, username, is_admin, created_at, last_login FROM users ORDER BY created_at');
     res.render('admin', { user: req.session.username, isAdmin: req.session.isAdmin, users: users.rows, error, success });
   };
 
@@ -46,7 +46,7 @@ router.post('/users/create', requireAdmin, async (req, res) => {
 router.post('/users/:id/delete', requireAdmin, async (req, res) => {
   const { id } = req.params;
   if (parseInt(id) === req.session.userId) {
-    const users = await pool.query('SELECT id, username, is_admin, created_at FROM users ORDER BY created_at');
+    const users = await pool.query('SELECT id, username, is_admin, created_at, last_login FROM users ORDER BY created_at');
     return res.render('admin', { user: req.session.username, isAdmin: req.session.isAdmin, users: users.rows, error: 'You cannot delete your own account', success: null });
   }
   await pool.query('DELETE FROM users WHERE id = $1', [id]);

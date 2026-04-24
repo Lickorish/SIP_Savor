@@ -28,6 +28,9 @@ router.post('/login', async (req, res) => {
     req.session.username = user.username;
     req.session.isAdmin = user.is_admin;
 
+    // Record last login time
+    await pool.query('UPDATE users SET last_login = NOW() WHERE id = $1', [user.id]);
+
     const returnTo = req.session.returnTo || '/';
     delete req.session.returnTo;
     res.redirect(returnTo);
