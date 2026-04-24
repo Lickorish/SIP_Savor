@@ -5,7 +5,8 @@ const PgSession = require('connect-pg-simple')(session);
 const path = require('path');
 const { pool, initDb } = require('./db');
 
-const app = express();
+const app = express(); 
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // View engine
@@ -28,6 +29,8 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    httpOnly: true, 
+    sameSite: 'lax',
   },
 }));
 
