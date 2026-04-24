@@ -34,6 +34,17 @@
       <% } %>
     </div>
   </div>
+
+  <% if (typeof isAdmin !== 'undefined' && isAdmin) { %>
+    <form method="POST" action="/place/<%= establishment.id %>/delete" style="margin-top:1.25rem">
+      <button type="submit" class="btn btn-danger btn-sm"
+        onclick="return confirm('Permanently delete <%= establishment.name %> and all its reviews and photos? This cannot be undone.')">
+        🗑 Delete this place
+      </button>
+    </form>
+  <% } %>
+
+</div>
 </div>
 
 <div class="place-layout">
