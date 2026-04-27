@@ -162,7 +162,7 @@ router.get('/place/:id', requireAuth, async (req, res) => {
   const { id } = req.params;
 
   const estResult = await pool.query(
-    `SELECT e.*, u.username AS added_by_name,
+    `SELECT e.*, COALESCE(u.display_name, u.username) AS added_by_name,
             ROUND(AVG(r.rating),1) AS avg_rating, COUNT(r.id) AS review_count
      FROM establishments e
      LEFT JOIN users u ON u.id = e.added_by
@@ -177,7 +177,7 @@ router.get('/place/:id', requireAuth, async (req, res) => {
   }
 
   const reviewsResult = await pool.query(
-    `SELECT r.*, u.username, 
+    `SELECT r.*, u.username, COALESCE(u.display_name, u.username) AS display_name,
             COALESCE(json_agg(rp.cloudinary_url) FILTER (WHERE rp.id IS NOT NULL), '[]') AS photos
      FROM reviews r
      JOIN users u ON u.id = r.user_id

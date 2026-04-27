@@ -70,7 +70,7 @@
           <div class="review-card <%= r.user_id === parseInt(establishment.added_by) && r.id === reviews[reviews.length-1]?.id ? '' : '' %> <%= r.user_id === parseInt(establishment.added_by) ? 'own' : '' %>">
             <div class="review-header">
               <div>
-                <div class="reviewer-name"><%= r.username %></div>
+                <div class="reviewer-name"><%= r.display_name %></div>
                 <div class="star-display" style="margin-top:0.2rem">
                   <div class="stars">
                     <% for (let i=1; i<=5; i++) { %>

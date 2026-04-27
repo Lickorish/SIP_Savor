@@ -50,4 +50,30 @@ router.post('/change-password', requireAuth, async (req, res) => {
   }
 });
 
+router.get('/profile', requireAuth, async (req, res) => {
+  const result = await pool.query('SELECT display_name FROM users WHERE id = $1', [req.session.userId]);
+  res.render('profile', {
+    user: req.session.username,
+    isAdmin: req.session.isAdmin,
+    display_name: result.rows[0].display_name || '',
+    error: null,
+    success: null,
+  });
+});
+
+router.post('/profile', requireAuth, async (req, res) => {
+  const { display_name } = req.body;
+  await pool.query('UPDATE users SET display_name = $1 WHERE id = $2',
+    [display_name ? display_name.trim() : null, req.session.userId]);
+  const result = await pool.query('SELECT display_name FROM users WHERE id = $1', [req.session.userId]);
+  res.render('profile', {
+    user: req.session.username,
+    isAdmin: req.session.isAdmin,
+    display_name: result.rows[0].display_name || '',
+    error: null,
+    success: 'Display name updated',
+  });
+});
+
+
 module.exports = router;

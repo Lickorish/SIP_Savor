@@ -1,0 +1,33 @@
+<%- include('partials/header', {title: 'My Profile'}) %>
+
+<div class="page-header">
+  <div class="eyebrow">Account</div>
+  <h1>My Profile</h1>
+  <p>How you appear to others on reviews</p>
+</div>
+
+<div class="container-narrow">
+  <% if (error) { %>
+    <div class="alert alert-error"><%= error %></div>
+  <% } %>
+  <% if (success) { %>
+    <div class="alert alert-success"><%= success %></div>
+  <% } %>
+
+  <form method="POST" action="/account/profile" class="card" style="padding:1.5rem; margin-bottom:1.25rem">
+    <div class="form-group">
+      <label for="display_name">Display name <span class="hint">(shown on your reviews)</span></label>
+      <input type="text" id="display_name" name="display_name"
+        value="<%= display_name %>"
+        placeholder="e.g. Dave">
+      <p style="font-size:0.78rem; color:var(--muted); font-style:italic; margin-top:0.35rem">
+        If left blank, your username (<strong><%= user %></strong>) will be shown instead
+      </p>
+    </div>
+    <button type="submit" class="btn btn-primary btn-full">Save Display Name</button>
+  </form>
+
+  <a href="/account/change-password" class="btn btn-ghost btn-full">Change password instead</a>
+</div>
+
+<%- include('partials/footer') %>
