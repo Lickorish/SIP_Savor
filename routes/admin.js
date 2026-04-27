@@ -64,4 +64,15 @@ router.post('/users/:id/reset-password', requireAdmin, async (req, res) => {
   res.redirect('/admin');
 });
 
+router.post('/users/:id/display-name', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { display_name } = req.body;
+  await pool.query(
+    'UPDATE users SET display_name = $1 WHERE id = $2',
+    [display_name ? display_name.trim() : null, id]
+  );
+  res.redirect('/admin');
+});
+
+
 module.exports = router;
