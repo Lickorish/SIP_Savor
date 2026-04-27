@@ -183,7 +183,7 @@ router.get('/place/:id', requireAuth, async (req, res) => {
      JOIN users u ON u.id = r.user_id
      LEFT JOIN review_photos rp ON rp.review_id = r.id
      WHERE r.establishment_id = $1
-     GROUP BY r.id, u.username
+     GROUP BY r.id, u.username, u.display_name
      ORDER BY r.created_at DESC`,
     [id]
   );
