@@ -168,7 +168,7 @@ router.get('/place/:id', requireAuth, async (req, res) => {
      LEFT JOIN users u ON u.id = e.added_by
      LEFT JOIN reviews r ON r.establishment_id = e.id
      WHERE e.id = $1
-     GROUP BY e.id, u.username`,
+     GROUP BY e.id, u.username, u.display_name`,
     [id]
   );
 
